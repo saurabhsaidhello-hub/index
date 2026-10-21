@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spectrum: the architecture of a fest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark;
+--bg:#000;--card:#0D0D0D;--ink:#F5F5F5;--mute:#A3A3A3;--line:#2A2A2A;--spo:#2DD4BF;--cul:#FF6B9D;--env:#9AD34A;--fas:#A68BFF;--soc:#FBBF24;--acc:#FF6B9D}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#000;--card:#0D0D0D;--ink:#F5F5F5;--mute:#A3A3A3;--line:#2A2A2A;--spo:#2DD4BF;--cul:#FF6B9D;--env:#9AD34A;--fas:#A68BFF;--soc:#FBBF24;--acc:#FF6B9D}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#000;--card:#0D0D0D;--ink:#F5F5F5;--mute:#A3A3A3;--line:#2A2A2A;--spo:#2DD4BF;--cul:#FF6B9D;--env:#9AD34A;--fas:#A68BFF;--soc:#FBBF24;--acc:#FF6B9D}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.65 "DM Sans",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+h1,h2,h3{font-family:"Bricolage Grotesque","DM Sans",sans-serif;line-height:1.1;margin:0}
+h2{font-size:clamp(1.8rem,5vw,2.8rem);margin-bottom:12px}h3{font-size:1.15rem;font-weight:500}
+p{margin:0 0 14px;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:11;display:flex;gap:6px;align-items:center;padding:12px 20px;background:var(--bg);border-bottom:1px solid var(--line);overflow-x:auto}
+nav b{font:700 1.2rem "Bricolage Grotesque",sans-serif;margin-right:auto;padding-right:16px}
+nav a{color:var(--mute);text-decoration:none;padding:4px 10px;border-radius:99px;white-space:nowrap;font-size:.95rem}
+nav a:hover{color:var(--ink);background:var(--card)}
+section{padding:72px 20px;max-width:1040px;margin:0 auto}
+.band{display:flex;height:14px;border-radius:99px;overflow:hidden;max-width:420px;margin:0 0 28px}
+.band i{flex:1}
+.hero h1{font-size:clamp(3.2rem,12vw,7rem);letter-spacing:-.03em;font-weight:700}
+.lede{font-size:1.2rem;color:var(--mute)}
+.tag{display:inline-block;font-size:.85rem;color:var(--mute);margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card p{margin:6px 0 0;color:var(--mute);font-size:.97rem}
+.root{display:inline-block;background:var(--ink);color:var(--bg);padding:10px 22px;border-radius:99px;font:700 1.2rem "Bricolage Grotesque",sans-serif;margin-bottom:22px}
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;border-left:2px solid var(--line);padding-left:18px}
+.map .card{padding:16px;border-top:4px solid var(--line)}.map .core{border-top-color:var(--acc)}
+.map ul{margin:8px 0 0;padding-left:18px;color:var(--mute);font-size:.93rem;line-height:1.5}
+.wide{grid-column:1/-1}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{border:1.5px solid var(--c,var(--line));color:var(--ink);background:transparent;border-radius:99px;padding:3px 12px;font:500 .9rem "DM Sans",sans-serif}
+.chip i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:7px}
+.legend{font-size:.9rem;color:var(--mute);margin-top:14px}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:8px 0 26px}
+.st{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:.95rem}
+.st.q{border:2px solid var(--acc);border-radius:99px;font-weight:500}
+.st.end{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ar{color:var(--mute)}
+.ar::after{content:"\2192"}
+.lane{font:500 1rem "Bricolage Grotesque",sans-serif;margin:22px 0 4px}
+.phones{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+.ph{width:250px;border:2px solid var(--ink);border-radius:26px;padding:14px;background:var(--card)}
+.bx{background:var(--line);border-radius:6px;padding:7px 9px;font-size:.78rem;color:var(--mute);margin-bottom:8px}
+.bx.k{background:var(--acc);color:#fff;text-align:center;font-weight:500}
+.bx.row{display:flex;justify-content:space-between}
+.bx.warn{background:transparent;border:1.5px dashed var(--soc);color:var(--ink)}
+.tabs{display:flex;justify-content:space-around;border-top:1px solid var(--line);padding-top:8px;font-size:.72rem;color:var(--mute)}
+.notes{flex:1;min-width:230px;padding-left:0;list-style:none;margin:0}
+.notes li{padding:10px 0;border-bottom:1px solid var(--line);font-size:.97rem;text-align:justify;hyphens:auto}
+.notes b{font-weight:500;color:var(--acc)}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.ctl button{cursor:pointer;font:500 .92rem "DM Sans",sans-serif;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:99px;padding:6px 14px}
+.ctl button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ctl button:focus-visible,nav a:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.ev{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:12px 16px;border-left:5px solid var(--c);background:var(--card);border-radius:0 10px 10px 0;margin-bottom:8px}
+.ev small{color:var(--mute)}
+.dev{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.dev div{background:var(--line);border-radius:8px;padding:10px;font-size:.85rem;color:var(--mute);display:grid;gap:6px}
+.dev span{background:var(--card);border-radius:4px;padding:6px 8px}
+.d1{grid-template-columns:repeat(3,1fr);flex:3 1 340px}.d2{grid-template-columns:repeat(2,1fr);flex:2 1 220px}.d3{flex:1 1 120px}
+.d1 .nv,.d2 .nv,.d3 .nv{grid-column:1/-1;background:var(--ink);color:var(--bg)}
+.fn{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:26px;padding:0 0 8px}
+.fn::before{content:"";position:absolute;inset:0;background:var(--line);opacity:.45;clip-path:polygon(36% 0,64% 0,100% 100%,0 100%);z-index:0}
+.tr{position:relative;z-index:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-align:center}
+.tr small{display:block;color:var(--mute);font-size:.85rem;margin-bottom:8px}
+.tr .chips{justify-content:center;margin-top:0}
+.t0{width:28%;min-width:150px;border:2px solid var(--ink)}.t1{width:50%}.t2{width:76%}.t3{width:100%}
+.t0 b{font:700 1.2rem "Bricolage Grotesque",sans-serif}
+.chip.n{border-style:dashed;color:var(--mute)}
+@media (max-width:700px){.fn::before{display:none}.t0,.t1,.t2,.t3{width:100%}}
+.mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:22px;margin-top:30px}
+.mini{display:flex;flex-direction:column;align-items:center;gap:8px}
+.mini .tr{padding:10px 12px}.mini .tr small{margin-bottom:6px;font-size:.8rem}
+.mini .m0{width:52%;border:2px solid var(--ink)}.mini .m1{width:80%}.mini .m2{width:100%}
+.mini .m0 b{font:700 1.05rem "Bricolage Grotesque",sans-serif}
+.mini .chip{font-size:.82rem;padding:2px 10px}
+.mini .chips{gap:6px}
+footer{padding:60px 20px 80px;text-align:center;color:var(--mute)}
+footer p{margin:0 auto 10px;text-align:center}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style></head>
+<body>
+<nav aria-label="Sections"><b>Spectrum</b><a href="#why">Basics</a><a href="#sitemap">Sitemap</a><a href="#flow">Flows</a><a href="#wire">Wireframes</a><a href="#tax">Taxonomy</a><a href="#resp">Screens</a></nav>
+
+<section class="hero">
+<div class="band" aria-hidden="true"><i style="background:var(--spo)"></i><i style="background:var(--cul)"></i><i style="background:var(--env)"></i><i style="background:var(--fas)"></i><i style="background:var(--soc)"></i></div>
+<h1>Spectrum, mapped.</h1>
+<p class="lede">The information architecture behind NIFT’s annual fest: five clubs, visitors from many colleges, one registration desk, and a lot of people who just want to know where to go next.</p>
+<p>A fest is a pop-up city. For a few days thousands of people arrive, most for the first time. Information architecture is the floor plan, signage and street map that keeps them from getting lost.</p>
+</section>
+
+<section id="why">
+<span class="tag">The basics</span>
+<h2>Every visitor asks three things</h2>
+<div class="grid">
+<div class="card"><h3>Where am I?</h3><p>Page titles, a highlighted menu item and the club colour tell a visitor which hub they are in.</p></div>
+<div class="card"><h3>What can I do here?</h3><p>Every event page ends in one clear action: Register. Every list can be filtered by club, day or college eligibility.</p></div>
+<div class="card"><h3>Where can I go next?</h3><p>Event pages link to related events, the schedule and the venue on the map.</p></div>
+</div>
+<p style="margin-top:26px">Four building blocks answer them. <b style="font-weight:500">Organization:</b> events are grouped by club, because that is how students already think about them, not by who on the committee owns them. <b style="font-weight:500">Labeling:</b> “Register”, not “Participation portal”. <b style="font-weight:500">Navigation:</b> nine items, one level deep. <b style="font-weight:500">Search:</b> for the visitor who types “dance” instead of browsing.</p>
+</section>
+
+<section id="sitemap">
+<span class="tag">Sitemap</span>
+<h2>Every page, in levels</h2>
+<p>A sitemap is the bird’s-eye view. The highlighted pages are the ones participants use most.</p>
+<div class="root">Spectrum</div>
+<div class="map">
+<div class="card"><h3>Home</h3><ul><li>Hero and countdown</li><li>Register button</li><li>Featured events</li><li>Sponsors</li></ul></div>
+<div class="card"><h3>About</h3><ul><li>About Spectrum</li><li>About NIFT</li><li>Organizing team</li><li>Past editions</li></ul></div>
+<div class="card core"><h3>Schedule</h3><ul><li>Day-wise timeline</li><li>Filter by club or venue</li><li>My schedule</li></ul></div>
+<div class="card core"><h3>Register</h3><ul><li>Online form</li><li>On-spot desk info</li><li>Status check and FAQs</li></ul></div>
+<div class="card core"><h3>Inauguration and shows</h3><ul><li>Opening programme</li><li>Chief guest</li><li>Cultural lineup</li></ul></div>
+<div class="card"><h3>Venue and info</h3><ul><li>Campus map</li><li>Travel and stay</li><li>Rules, help desk</li></ul></div>
+<div class="card"><h3>Gallery</h3><ul><li>Photos and videos</li><li>Past editions</li></ul></div>
+<div class="card"><h3>Contact and sponsors</h3><ul><li>Club coordinators</li><li>Sponsor enquiry</li></ul></div>
+<div class="card core wide"><h3>Events</h3>
+<div class="chips">
+<span class="chip" style="--c:var(--spo)"><i></i>Sports</span><span class="chip" style="--c:var(--cul)"><i></i>Cultural</span><span class="chip" style="--c:var(--env)"><i></i>Environment and social service</span><span class="chip" style="--c:var(--fas)"><i></i>Fashion</span><span class="chip" style="--c:var(--soc)"><i></i>Social media</span></div>
+<p style="margin-top:12px">Each club hub lists its events. Every event page uses one template: description, rules, eligibility, team size, date and venue, fee, prizes, coordinators and a Register button.</p></div>
+</div>
+</section>
+
+<section id="funnel">
+<span class="tag">Sitemap, as a funnel</span>
+<h2>Start narrow, open up as you go</h2>
+<p>Turn the sitemap upside down and it widens like an inverted funnel. One front door leads to a handful of sections, which lead to more pages, which lead to every event. Read it from the top.</p>
+<div class="fn">
+<div class="tr t0"><small>Level 0 · 1 site</small><b>Spectrum</b></div>
+<div class="tr t1"><small>Level 1 · 9 sections in the menu</small><div class="chips"><span class="chip">Home</span><span class="chip">About</span><span class="chip">Events</span><span class="chip">Schedule</span><span class="chip">Register</span><span class="chip">Shows</span><span class="chip">Venue</span><span class="chip">Gallery</span><span class="chip">Contact</span></div></div>
+<div class="tr t2"><small>Level 2 · hubs and sub-pages</small><div class="chips"><span class="chip" style="--c:var(--spo)"><i></i>Sports hub</span><span class="chip" style="--c:var(--cul)"><i></i>Cultural hub</span><span class="chip" style="--c:var(--env)"><i></i>Environment hub</span><span class="chip" style="--c:var(--fas)"><i></i>Fashion hub</span><span class="chip" style="--c:var(--soc)"><i></i>Social media hub</span><span class="chip">Online form</span><span class="chip">On-spot desk</span><span class="chip">Day-wise timeline</span><span class="chip">Opening programme</span><span class="chip">Cultural lineup</span><span class="chip">Campus map</span><span class="chip">Help desk</span></div></div>
+<div class="tr t3"><small>Level 3 · one page per event</small><div class="chips"><span class="chip" style="--c:var(--spo)"><i></i>Futsal cup</span><span class="chip" style="--c:var(--spo)"><i></i>Relay race</span><span class="chip" style="--c:var(--cul)"><i></i>Battle of bands</span><span class="chip" style="--c:var(--cul)"><i></i>Solo dance</span><span class="chip" style="--c:var(--env)"><i></i>Upcycle challenge</span><span class="chip" style="--c:var(--env)"><i></i>Campus clean drive</span><span class="chip" style="--c:var(--fas)"><i></i>Runway showdown</span><span class="chip" style="--c:var(--fas)"><i></i>Styling duel</span><span class="chip" style="--c:var(--soc)"><i></i>Reel-a-thon</span><span class="chip" style="--c:var(--soc)"><i></i>Meme war</span><span class="chip n">and every other event</span></div></div>
+</div>
+<p style="margin-top:22px">Because the structure is shallow, any event is three taps from the home page: Home, then Events, then a club hub, then the event. Deep menus lose visitors, and this is why Spectrum’s stays shallow.</p>
+<h3 style="margin-top:44px;font-size:1.4rem">Zoom into five sections</h3>
+<p>Each Level 1 section opens into its own small funnel: the section at the top, its pages below, and the details inside those pages at the bottom.</p>
+<div class="mini-grid">
+<div class="mini"><div class="tr m0"><small>Level 1</small><b>About</b></div>
+<div class="tr m1"><small>Pages</small><div class="chips"><span class="chip">About Spectrum</span><span class="chip">About NIFT</span><span class="chip">Organizing team</span><span class="chip">Past editions</span></div></div>
+<div class="tr m2"><small>Details</small><div class="chips"><span class="chip">Theme and vision</span><span class="chip">Club heads</span><span class="chip">Faculty coordinators</span><span class="chip">Winners</span><span class="chip">Highlights</span></div></div></div>
+<div class="mini"><div class="tr m0"><small>Level 1</small><b>Register</b></div>
+<div class="tr m1"><small>Pages</small><div class="chips"><span class="chip">Online form</span><span class="chip">On-spot desk</span><span class="chip">Status check</span><span class="chip">FAQs</span></div></div>
+<div class="tr m2"><small>Details</small><div class="chips"><span class="chip">Participant type</span><span class="chip">Personal details</span><span class="chip">Event selection</span><span class="chip">Team details</span><span class="chip">Payment</span><span class="chip">QR pass</span><span class="chip">Desk location</span><span class="chip">Documents to carry</span></div></div></div>
+<div class="mini"><div class="tr m0"><small>Level 1</small><b>Venue</b></div>
+<div class="tr m1"><small>Pages</small><div class="chips"><span class="chip">Campus map</span><span class="chip">Travel and stay</span><span class="chip">Rules</span><span class="chip">Help desk</span></div></div>
+<div class="tr m2"><small>Details</small><div class="chips"><span class="chip">Registration desk</span><span class="chip">Stages</span><span class="chip">Event venues</span><span class="chip">Food</span><span class="chip">First aid</span><span class="chip">Emergency contacts</span></div></div></div>
+<div class="mini"><div class="tr m0"><small>Level 1</small><b>Gallery</b></div>
+<div class="tr m1"><small>Pages</small><div class="chips"><span class="chip">Photos</span><span class="chip">Videos</span><span class="chip">Past editions</span><span class="chip">Live highlights</span></div></div>
+<div class="tr m2"><small>Details</small><div class="chips"><span class="chip">By club</span><span class="chip">By day</span><span class="chip">Download</span></div></div></div>
+<div class="mini"><div class="tr m0"><small>Level 1</small><b>Contact</b></div>
+<div class="tr m1"><small>Pages</small><div class="chips"><span class="chip">Club coordinators</span><span class="chip">General queries</span><span class="chip">Sponsor enquiry</span></div></div>
+<div class="tr m2"><small>Details</small><div class="chips"><span class="chip" style="--c:var(--spo)"><i></i>Sports</span><span class="chip" style="--c:var(--cul)"><i></i>Cultural</span><span class="chip" style="--c:var(--env)"><i></i>Environment</span><span class="chip" style="--c:var(--fas)"><i></i>Fashion</span><span class="chip" style="--c:var(--soc)"><i></i>Social media</span><span class="chip">Sponsorship form</span></div></div></div>
+</div>
+</section>
+
+<section id="flow">
+<span class="tag">User flows</span>
+<h2>One person, one task</h2>
+<p>A user flow follows someone through a task and shows the decision points where things can go wrong.</p>
+<div class="lane">Visitor from another college, pre-registered</div>
+<div class="flow"><span class="st">Browse events</span><span class="ar"></span><span class="st">Pick club and event</span><span class="ar"></span><span class="st">Register online</span><span class="ar"></span><span class="st">Get QR pass</span><span class="ar"></span><span class="st">Scan at desk</span><span class="ar"></span><span class="st end">Collect kit</span></div>
+<div class="lane">Walk-in participant</div>
+<div class="flow"><span class="st">Arrive at campus</span><span class="ar"></span><span class="st q">Pre-registered?</span><span class="ar"></span><span class="st">No: fill form at desk</span><span class="ar"></span><span class="st">Choose events</span><span class="ar"></span><span class="st">Pay</span><span class="ar"></span><span class="st end">Collect pass</span></div>
+<div class="lane">Fest day, everyone</div>
+<div class="flow"><span class="st">Check in</span><span class="ar"></span><span class="st">Inauguration</span><span class="ar"></span><span class="st">Cultural shows</span><span class="ar"></span><span class="st">Club events in parallel</span><span class="ar"></span><span class="st">Results and prizes</span><span class="ar"></span><span class="st end">Closing</span></div>
+</section>
+
+<section id="wire">
+<span class="tag">Wireframes</span>
+<h2>Structure first, style later</h2>
+<p>Two screens decide whether the fest works: the home screen and registration. Grey boxes only, so the layout is judged on its own.</p>
+<div class="phones">
+<div class="ph" role="img" aria-label="Home screen wireframe">
+<div class="bx row"><span>Spectrum</span><span>Menu</span></div>
+<div class="bx" style="height:54px">Countdown to day 1</div>
+<div class="bx k">Register now</div>
+<div class="bx">Sports | Cultural | Env | Fashion | Social</div>
+<div class="bx row"><span>Inauguration</span><span>10:00</span></div>
+<div class="bx row"><span>Battle of bands</span><span>Main stage</span></div>
+<div class="tabs"><span>Home</span><span>Events</span><span>Schedule</span><span>My pass</span></div></div>
+<ol class="notes"><li><b>Register is always visible.</b> It is the one action every visitor needs.</li><li><b>Club chips as shortcuts.</b> Straight to a hub in one tap.</li><li><b>Next up.</b> Answers “where do I go now?” without opening the schedule.</li><li><b>Bottom bar.</b> Same four places on every screen.</li></ol></div>
+<div class="phones" style="margin-top:40px">
+<div class="ph" role="img" aria-label="Registration screen wireframe">
+<div class="bx row"><span>Details</span><span><b>Events</b></span><span>Team</span><span>Pay</span></div>
+<div class="bx">I am from: NIFT / Other college</div>
+<div class="bx row"><span>Runway showdown</span><span>Day 1, 2 pm</span></div>
+<div class="bx row"><span>Reel-a-thon</span><span>Day 1, 2 pm</span></div>
+<div class="bx warn">These two events overlap. Pick one.</div>
+<div class="bx k">Continue</div></div>
+<ol class="notes"><li><b>Four steps, one screen each.</b> Progress is always shown.</li><li><b>Clash detection.</b> Warns before payment, not after.</li><li><b>Participant type first.</b> NIFT students and visitors see different fees and fields.</li></ol></div>
+</section>
+
+<section id="tax">
+<span class="tag">Taxonomy</span>
+<h2>Categories to browse, tags to filter</h2>
+<p>Each event lives in exactly one club (a category) and carries tags that cut across clubs. Try it below.</p>
+<div class="ctl" id="clubs" role="group" aria-label="Club"></div>
+<div class="ctl" id="tags" role="group" aria-label="Tags"></div>
+<div id="list" aria-live="polite"></div>
+</section>
+
+<section id="resp">
+<span class="tag">Every screen size</span>
+<h2>One structure, three layouts</h2>
+<p>Most visitors will use phones on a crowded campus. Content and menu order stay identical; only the columns change.</p>
+<div class="dev">
+<div class="d1"><span class="nv">Desktop: full menu</span><span>Event</span><span>Event</span><span>Event</span></div>
+<div class="d2"><span class="nv">Tablet</span><span>Event</span><span>Event</span></div>
+<div class="d3"><span class="nv">Phone</span><span>Event</span><span>Event</span></div></div>
+<p style="margin-top:22px">On a phone, the menu collapses and Register stays pinned, so the most needed action is always one tap away.</p>
+</section>
+
+<footer><div class="band" aria-hidden="true" style="margin:0 auto 20px"><i style="background:var(--spo)"></i><i style="background:var(--cul)"></i><i style="background:var(--env)"></i><i style="background:var(--fas)"></i><i style="background:var(--soc)"></i></div>
+<p>Good architecture is invisible. Visitors only notice it when it is missing.</p><p>Spectrum · NIFT annual fest</p></footer>
+
+<script>
+var C={Sports:'--spo',Cultural:'--cul','Env. and social':'--env',Fashion:'--fas','Social media':'--soc'};
+var E=[["Futsal cup","Sports","Team","Open"],["Relay race","Sports","Team","NIFT only"],["Battle of bands","Cultural","Team","Open"],["Solo dance","Cultural","Solo","Open"],["Upcycle challenge","Env. and social","Team","Open"],["Campus clean drive","Env. and social","Team","NIFT only"],["Runway showdown","Fashion","Team","Open"],["Styling duel","Fashion","Solo","NIFT only"],["Reel-a-thon","Social media","Solo","Open"],["Meme war","Social media","Solo","NIFT only"]];
+var club="All",tag="Any";
+function btns(id,vals,get,set){var el=document.getElementById(id);el.innerHTML="";vals.forEach(function(v){var b=document.createElement("button");b.textContent=v;b.setAttribute("aria-pressed",get()===v);b.onclick=function(){set(v);draw()};el.appendChild(b)})}
+function draw(){
+btns("clubs",["All"].concat(Object.keys(C)),function(){return club},function(v){club=v});
+btns("tags",["Any","Open","NIFT only","Solo","Team"],function(){return tag},function(v){tag=v});
+var l=document.getElementById("list");l.innerHTML="";
+var r=E.filter(function(e){return(club==="All"||e[1]===club)&&(tag==="Any"||e[2]===tag||e[3]===tag)});
+if(!r.length){l.textContent="No events match. Clear a filter to see more.";return}
+r.forEach(function(e){var d=document.createElement("div");d.className="ev";d.style.setProperty("--c","var("+C[e[1]]+")");
+var a=document.createElement("span");a.textContent=e[0];var s=document.createElement("small");s.textContent=e[1]+" · "+e[2]+" · "+(e[3]==="Open"?"Open to all colleges":"NIFT only");d.appendChild(a);d.appendChild(s);l.appendChild(d)})}
+draw();
+</script>
+</body></html>
